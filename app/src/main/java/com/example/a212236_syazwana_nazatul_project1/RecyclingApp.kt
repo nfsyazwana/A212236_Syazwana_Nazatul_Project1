@@ -2,9 +2,7 @@ package com.example.a212236_syazwana_nazatul_project1
 
 import android.content.res.Configuration
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
+  import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,8 +10,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.a212236_syazwana_nazatul_project1.ui.theme.fixedPrimary
 import com.example.a212236_syazwana_nazatul_project1.ui.theme.EcoEarnTheme
 
-enum class RecyclingScreen(@StringRes val title: Int) {
+enum class RecyclingScreen(@param:StringRes val title: Int) {
     Main(R.string.app_name),
     Form(R.string.submit_recycling),
     Preview(R.string.preview_submission),
@@ -34,7 +30,105 @@ enum class RecyclingScreen(@StringRes val title: Int) {
     CashOut(R.string.cash_out)
 }
 
+@Composable
+fun RecyclingApp(
+    viewModel: RecyclingViewModel = viewModel(),
+    navController: NavHostController = rememberNavController()
+) {
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentScreen = try {
+        RecyclingScreen.valueOf(
+            backStackEntry?.destination?.route ?: RecyclingScreen.Main.name
+        )
+    } catch (_: Exception) {
+        RecyclingScreen.Main
+    }
 
+    Scaffold(
+        topBar = {
+            RecyclingAppBar(
+                currentScreen = currentScreen,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() }
+            )
+        }
+    ) { innerPadding ->
+        val userStats by viewModel.userStats.collectAsState()
+        val currentSubmission by viewModel.currentSubmission.collectAsState()
+
+        NavHost(
+            navController = navController,
+            startDestination = RecyclingScreen.Main.name,
+            modifier = Modifier.padding(innerPadding)
+        ) {
+            composable(route = RecyclingScreen.Main.name) {
+                MainScreen(
+                    userStats = userStats,
+                    onNavigateToForm = { category ->
+                        viewModel.updateCurrentSubmission(currentSubmission.copy(itemCategory = category))
+                        navController.navigate(RecyclingScreen.Form.name)
+                    },
+                    onRewardClick = {
+                        navController.navigate(RecyclingScreen.Reward.name)
+                    },
+                    onCashOutClick = {
+                        navController.navigate(RecyclingScreen.CashOut.name)
+                    }
+                )
+            }
+            composable(route = RecyclingScreen.Form.name) {
+                SubmissionFormScreen(
+                    onNextButtonClicked = {
+                        navController.navigate(RecyclingScreen.Preview.name)
+                    },
+                    onCancelButtonClicked = {
+                        viewModel.resetSubmission()
+                        navController.popBackStack(RecyclingScreen.Main.name, inclusive = false)
+                    },
+                    viewModel = viewModel
+                )
+            }
+            composable(route = RecyclingScreen.Preview.name) {
+                PreviewScreen(
+                    submission = currentSubmission,
+                    onConfirmButtonClicked = {
+                        viewModel.saveSubmission(currentSubmission)
+                        navController.popBackStack(RecyclingScreen.Main.name, inclusive = false)
+                    },
+                    onEditButtonClicked = {
+                        navController.popBackStack()
+                    },
+                    onCancelButtonClicked = {
+                        viewModel.resetSubmission()
+                        navController.popBackStack(RecyclingScreen.Main.name, inclusive = false)
+                    }
+                )
+            }
+            composable(route = RecyclingScreen.Reward.name) {
+                RewardScreen(
+                    userStats = userStats,
+                    onRedeemReward = { points ->
+                        viewModel.redeemReward(points)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+            composable(route = RecyclingScreen.CashOut.name) {
+                CashOutScreen(
+                    userStats = userStats,
+                    onCashOutComplete = { points ->
+                        viewModel.redeemReward(points)
+                    },
+                    onBackClick = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,7 +164,6 @@ fun RecyclingAppBar(
         }
     )
 }
-
 
 @Preview(showBackground = true, name = "Light Mode")
 @Composable
