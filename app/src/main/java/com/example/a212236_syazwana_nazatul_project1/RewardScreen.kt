@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import java.io.Serializable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,7 +32,7 @@ data class RewardItem(
     val pointsRequired: Int,
     val icon: String,
     val isAvailable: Boolean = true
-)
+) : Serializable
 
 val availableRewards = listOf(
     RewardItem(1, "RM5 Voucher", "GrabFood / Shopee voucher", 500, "🎫"),
@@ -50,10 +52,10 @@ fun RewardScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showSnackbar by remember { mutableStateOf(false) }
-    var snackbarMessage by remember { mutableStateOf("") }
-    var selectedReward by remember { mutableStateOf<RewardItem?>(null) }
-    var showConfirmation by remember { mutableStateOf(false) }
+    var showSnackbar by rememberSaveable { mutableStateOf(false) }
+    var snackbarMessage by rememberSaveable { mutableStateOf("") }
+    var selectedReward by rememberSaveable { mutableStateOf<RewardItem?>(null) }
+    var showConfirmation by rememberSaveable { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -61,18 +63,6 @@ fun RewardScreen(
                 .fillMaxSize()
                 .padding(dimensionResource(R.dimen.padding_medium))
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "🎁 Rewards Marketplace",
-                    style = Typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
             Spacer(modifier = Modifier.height(16.dp))
 
             Card(

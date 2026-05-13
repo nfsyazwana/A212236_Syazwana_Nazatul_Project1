@@ -11,6 +11,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import java.io.Serializable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +34,7 @@ data class CashOutRequest(
     val bankName: String = "",
     val bankAccount: String = "",
     val email: String = ""
-)
+) : Serializable
 
 val supportedBanks = listOf(
     "Maybank",
@@ -60,13 +62,13 @@ fun CashOutScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
-    var cashOutRequest by remember { mutableStateOf(CashOutRequest()) }
-    var selectedAmount by remember { mutableStateOf<Int?>(null) }
-    var expandedBank by remember { mutableStateOf(false) }
-    var showConfirmation by remember { mutableStateOf(false) }
-    var showSnackbar by remember { mutableStateOf(false) }
-    var snackbarMessage by remember { mutableStateOf("") }
-    var isSubmitting by remember { mutableStateOf(false) }
+    var cashOutRequest by rememberSaveable { mutableStateOf(CashOutRequest()) }
+    var selectedAmount by rememberSaveable { mutableStateOf<Int?>(null) }
+    var expandedBank by rememberSaveable { mutableStateOf(false) }
+    var showConfirmation by rememberSaveable { mutableStateOf(false) }
+    var showSnackbar by rememberSaveable { mutableStateOf(false) }
+    var snackbarMessage by rememberSaveable { mutableStateOf("") }
+    var isSubmitting by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val isDarkTheme = isSystemInDarkTheme()
 

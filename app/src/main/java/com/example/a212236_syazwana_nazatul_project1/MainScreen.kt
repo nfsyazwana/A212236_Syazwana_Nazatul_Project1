@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,25 +37,6 @@ import com.example.a212236_syazwana_nazatul_project1.data.LocationData
 import com.example.a212236_syazwana_nazatul_project1.data.UserStats
 import com.example.a212236_syazwana_nazatul_project1.ui.theme.*
 
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    EcoEarnTheme {
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0F5238).copy(alpha = 0.7f))) {
-            MainScreen(
-                userStats = UserStats(
-                    totalPoints = 1250,
-                    recycledItems = 15,
-                    donatedItems = 8
-                ),
-                onNavigateToForm = {},
-                onRewardClick = {},
-                onCashOutClick = {}
-            )
-        }
-    }
-}
-
 @Composable
 fun MainScreen(
     userStats: UserStats,
@@ -65,9 +47,9 @@ fun MainScreen(
 ) {
     val scrollState = rememberScrollState()
     val keyboardController = LocalSoftwareKeyboardController.current
-    var locationInput by remember { mutableStateOf("") }
-    var searchedLocation by remember { mutableStateOf("") }
-    var isSubmitted by remember { mutableStateOf(false) }
+    var locationInput by rememberSaveable { mutableStateOf("") }
+    var searchedLocation by rememberSaveable { mutableStateOf("") }
+    var isSubmitted by rememberSaveable { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -269,7 +251,7 @@ fun PointBalance(
             .padding(horizontal = dimensionResource(R.dimen.padding_medium), vertical = dimensionResource(R.dimen.padding_small)),
         shape = SoftRoundShape,
         colors = CardDefaults.cardColors(
-            containerColor = fixedPrimary
+            containerColor = fixedPrimary.copy(alpha = 0.85f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
@@ -419,7 +401,7 @@ fun RecycleCategories(onCategoryClick: (String) -> Unit, modifier: Modifier = Mo
                     modifier = Modifier
                         .width(100.dp)
                         .height(75.dp)
-                        .background(fixedPrimary, GentleShape)
+                        .background(fixedPrimary.copy(alpha = 0.85f), GentleShape)
                         .clickable { onCategoryClick(category) },
                     contentAlignment = Alignment.Center
                 ) {
@@ -439,7 +421,7 @@ fun RecycleCategories(onCategoryClick: (String) -> Unit, modifier: Modifier = Mo
 
 @Composable
 fun LocationCard(location: LocationData, modifier: Modifier = Modifier) {
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     Card(
         modifier = modifier
@@ -448,7 +430,7 @@ fun LocationCard(location: LocationData, modifier: Modifier = Modifier) {
             .clickable { expanded = !expanded },
         shape = GentleShape,
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.9f)
+            containerColor = MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.8f)
         )
     ) {
         Column(
@@ -502,6 +484,26 @@ fun LocationCard(location: LocationData, modifier: Modifier = Modifier) {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                 )
             }
+        }
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun MainScreenPreview() {
+    EcoEarnTheme {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFF0F5238).copy(alpha = 0.7f))) {
+            MainScreen(
+                userStats = UserStats(
+                    totalPoints = 1250,
+                    recycledItems = 15,
+                    donatedItems = 8
+                ),
+                onNavigateToForm = {},
+                onRewardClick = {},
+                onCashOutClick = {}
+            )
         }
     }
 }
